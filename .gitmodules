@@ -1,0 +1,6 @@
+[submodule "vocab"]
+	path = vocab
+	url = git@github.com:fusepoolP3/vocab.git
+[submodule "p3-transformer-library"]
+	path = p3-transformer-library
+	url = git@github.com:fusepoolP3/p3-transformer-library.git
