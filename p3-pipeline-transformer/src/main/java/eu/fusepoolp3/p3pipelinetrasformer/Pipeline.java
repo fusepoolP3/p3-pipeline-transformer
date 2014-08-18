@@ -1,9 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.fusepoolp3.p3pipelinetrasformer;
 
+import eu.fusepool.p3.transformer.client.Transformer;
+import eu.fusepool.p3.transformer.commons.Entity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,15 +13,12 @@ import javax.activation.MimeType;
  */
 public class Pipeline {
 
-    final private Set<MimeType> supportedInputFormats;
-    final private Set<MimeType> supportedOutputFormats;
+    private Set<MimeType> supportedInputFormats;
+    private Set<MimeType> supportedOutputFormats;
     private Map<Integer, Transformer> transformers;
     private int index;
 
-    public Pipeline(Set<MimeType> _supportedInputFormats, Set<MimeType> _supportedOutputFormats) {
-        supportedInputFormats = _supportedInputFormats;
-        supportedOutputFormats = _supportedOutputFormats;
-
+    public Pipeline() {
         transformers = new HashMap<>();
         index = 0;
     }
@@ -32,82 +27,77 @@ public class Pipeline {
         index = transformers.size();
         transformers.put(index, transformer);
     }
-
-    public String run(String data) {
+    
+    public void setSupportedFormats() {
+        // set supported input formats of the pipeline to the supported input formats
+        // of the first transformer in the pipeline
+        supportedInputFormats = transformers.get(0).getSupportedInputFormats();
+        // set supported output formats of the pipeline to the supported output formats
+        // of the last transformer in the pipeline
+        supportedOutputFormats = transformers.get(index).getSupportedOutputFormats();
+    }
+    
+    public void setSupportedFormats(Set<MimeType> _supportedInputFormats, Set<MimeType> _supportedOutputFormats) {
+        // set supported input formats of the pipeline explicitly
+        supportedInputFormats = _supportedInputFormats;
+        // set supported output formats of the pipeline explicitly
+        supportedOutputFormats = _supportedOutputFormats;
+    }
+    
+    public Entity run(Entity data) {
         Transformer t;
         for (int i = 0; i < index + 1; i++) {
             t = transformers.get(i);
             if (t == null) {
                 throw new RuntimeException("Transformer cannot be null!");
             }
-            data = t.run(data, getNextAcceptedMediaTypes(i));
+            data = t.transform(data, getAcceptedMediaTypes(i));
         }
         return data;
     }
 
-    public Boolean Validate() {
+    public Boolean validate() {
+        Boolean accepts;
         Transformer t1, t2;
-
-        for (int i = 0; i < index + 1; i++) {
-            t1 = transformers.get(i);
-            t2 = transformers.get(i + 1);
-            // t1 cannot be null
-            if (t1 == null) {
-                throw new RuntimeException("Transformer cannot be null!");
-            }
-            if (t2 != null) {
-                if (!t1.isCompatible(t2)) {
-                    return false;
+        // if there is more than one transformer in the pipeline
+        if(index > 0) {
+            for (int i = 0; i < index; i++) {
+                accepts = false;
+                t1 = transformers.get(i);
+                t2 = transformers.get(i + 1);
+                // t1, t2 cannot be null if there is more than one transformer
+                // in the pipeline
+                if (t1 == null || t2 == null) {
+                    throw new RuntimeException("Transformer cannot be null!");
                 }
-            } else {
-                // if t2 null there is no more transformer in the pipeline
-                if (!this.isCompatible(t1)) {
-                    return false;
+                // loop through the supported output formats of t1 and check if
+                // t2 accepts any of them
+                for (MimeType mimeType : t1.getSupportedOutputFormats()) {
+                    if (t2.accepts(mimeType)) {
+                        accepts = true;
+                    }
+                }
+                // if no output format of t1 is accepted by t2 as input format
+                if(!accepts) {
+                    throw new RuntimeException("Incompatible transformers found in pipeline!");
                 }
             }
         }
         return true;
     }
 
-    private String getNextAcceptedMediaTypes(int key) {
+    private MimeType[] getAcceptedMediaTypes(int key) {
         // get the next transformer
         Transformer t = transformers.get(key + 1);
 
         if (t != null) {
             // t is not null, t is the next transformer in the pipeline,
             // return the accepted input formats of the next transformer
-            return getSupportedFormatsAsString(t.supportedInputFormats);
+            return t.getSupportedInputFormats().toArray(new MimeType[t.getSupportedInputFormats().size()]);
         } else {
             // if t is null, there is no more transformer in the pipeline, 
             // return the output accepted formats of the pipeline transformer itself
-            return getSupportedFormatsAsString(supportedOutputFormats);
+            return supportedOutputFormats.toArray(new MimeType[supportedOutputFormats.size()]);
         }
-    }
-
-    private String getSupportedFormatsAsString(Set<MimeType> supportedFormats) {
-        String result = "";
-        int temp = 0;
-
-        for (MimeType m : supportedFormats) {
-            if (temp == 0) {
-                result += m.toString();
-            } else {
-                result += ", " + m.toString();
-            }
-            temp++;
-        }
-
-        return result;
-    }
-
-    private Boolean isCompatible(Transformer t) {
-        for (MimeType m : supportedOutputFormats) {
-            for (MimeType m2 : t.supportedOutputFormats) {
-                if (m.match(m2)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

@@ -1,6 +1,6 @@
 package eu.fusepoolp3.p3pipelinetrasformer;
 
-import eu.fusepool.extractor.server.ExtractorServer;
+import eu.fusepool.p3.transformer.server.TransformerServer;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
 public class Main {
@@ -13,8 +13,8 @@ public class Main {
     }
 
     private static void start(Arguments arguments) throws Exception {
-        ExtractorServer server = new ExtractorServer(arguments.getPort());
-
+        TransformerServer server = new TransformerServer(arguments.getPort());
+     
         server.start(new PipelineTransformer());
 
         server.join();
