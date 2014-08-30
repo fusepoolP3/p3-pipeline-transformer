@@ -7,10 +7,6 @@
   <packaging>pom</packaging>
   <name>Fusepool P3 Platform: Pipeline Transformer Parent</name>
   <modules>
-    <module>p3-vocab</module>
-	<module>p3-transformer-commons</module>
-    <module>p3-transformer-library</module>
-	<module>p3-transformer-client-library</module>
     <module>p3-pipeline-transformer</module>
   </modules>
   <properties>
