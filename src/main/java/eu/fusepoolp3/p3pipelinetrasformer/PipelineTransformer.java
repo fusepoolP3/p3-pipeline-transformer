@@ -1,7 +1,7 @@
 package eu.fusepoolp3.p3pipelinetrasformer;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.SyncExtractor;
+import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
@@ -25,10 +25,10 @@ import org.apache.commons.io.IOUtils;
  *
  * @author Gabor
  */
-public class PipelineTransformer implements SyncExtractor {
-
+public class PipelineTransformer implements SyncTransformer {
+    
     @Override
-    public Entity extract(HttpRequestEntity entity) throws IOException {
+    public Entity transform(HttpRequestEntity entity) throws IOException {
         // get mimetype of content
         final MimeType mimeType = entity.getType();
         // convert content to byte array
