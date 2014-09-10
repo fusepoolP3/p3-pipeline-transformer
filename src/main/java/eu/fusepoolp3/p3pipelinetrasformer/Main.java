@@ -39,7 +39,7 @@ public class Main {
                             // if pipeline transformer is not found in cache
                             if(pipelineTransformer == null){
                                 // create a new  pipeline transformer
-                                pipelineTransformer = new PipelineTransformer(request);
+                                pipelineTransformer = new PipelineTransformer(request.getQueryString());
                                 // put the pipeline transformer in the cache 
                                 pipelines.put(request.getQueryString(), pipelineTransformer);
                             }

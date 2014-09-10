@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -27,15 +26,12 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PipelineTransformer implements SyncTransformer {
 
-    private HttpServletRequest request;
     private Map<String, String> queryParams;
     private Pipeline pipeline;
 
-    public PipelineTransformer(HttpServletRequest _request) {
-        request = _request;
-
+    public PipelineTransformer(String queryString) {
         // get query params from query string
-        queryParams = getQueryParams(request.getQueryString());
+        queryParams = getQueryParams(queryString);
 
         // query string must not be empty
         if (queryParams.isEmpty()) {
