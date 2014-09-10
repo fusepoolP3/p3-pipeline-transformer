@@ -21,7 +21,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
+ * This class represents a pipeline transformer.
+ * 
  * @author Gabor
  */
 public class PipelineTransformer implements SyncTransformer {
@@ -73,10 +74,10 @@ public class PipelineTransformer implements SyncTransformer {
                     throw new RuntimeException("Incompatible transformers!");
                 }
             } else {
+                // the pipeline should contain at least on transformer
                 throw new RuntimeException("Pipeline contains no transformer!");
             }
         }
-
     }
 
     @Override
@@ -123,6 +124,12 @@ public class PipelineTransformer implements SyncTransformer {
         return false;
     }
 
+    /**
+     * Get query parameters from a query string.
+     * 
+     * @param queryString the query string
+     * @return HashMap containing the query parameters
+     */
     private Map<String, String> getQueryParams(String queryString) {
         Map<String, String> temp = new HashMap<>();
         // query string should not be empty or blank

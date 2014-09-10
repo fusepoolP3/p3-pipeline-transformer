@@ -15,6 +15,12 @@ public class Main {
         }
     }
 
+    /**
+     * Starts the transformer server.
+     * 
+     * @param arguments contains the port on which the server will listen
+     * @throws Exception 
+     */
     private static void start(Arguments arguments) throws Exception {
         TransformerServer server = new TransformerServer(arguments.getPort());
         

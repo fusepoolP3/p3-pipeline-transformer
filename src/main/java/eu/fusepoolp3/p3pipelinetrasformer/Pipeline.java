@@ -8,7 +8,8 @@ import java.util.Set;
 import javax.activation.MimeType;
 
 /**
- *
+ * This class represents a pipeline for applying transformers in sequence.
+ * 
  * @author Gabor
  */
 public class Pipeline {
@@ -23,23 +24,36 @@ public class Pipeline {
         index = 0;
     }
 
-    public Boolean isEmpty(){
+    /**
+     * Checks if there is any transformer in the pipeline.
+     * @return 
+     */
+    public Boolean isEmpty() {
         return transformers.isEmpty();
     }
-    
+
     public void addTransformer(Transformer transformer) {
         index = transformers.size();
         transformers.put(index, transformer);
     }
 
+    /**
+     * Get supported input formats of the pipeline.
+     */
     public Set<MimeType> getSupportedInputFormats() {
         return supportedInputFormats;
     }
 
+    /**
+     * Get supported output formats of the pipeline.
+     */
     public Set<MimeType> getSupportedOutputFormats() {
         return supportedOutputFormats;
     }
 
+    /**
+     * Sets the supported input and output formats of the pipeline.
+     */
     public void setSupportedFormats() {
         // set supported input formats of the pipeline to the supported input formats
         // of the first transformer in the pipeline
@@ -49,6 +63,16 @@ public class Pipeline {
         supportedOutputFormats = transformers.get(index).getSupportedOutputFormats();
     }
 
+    /**
+     * It runs the pipeline by invoking the transform method of each transformer
+     * in the pipe in order, and supplying the output of each transformer to the
+     * next. The first transformer gets the Entity that was originally posted to
+     * the pipeline transformer. The output of the last transformer in the pipe
+     * is the output of the pipeline.
+     *
+     * @param data original Entity posted to the pipeline transformer
+     * @return the Entity that is the output of the last transformer in the pipe
+     */
     public Entity run(Entity data) {
         Transformer t;
         for (int i = 0; i < index + 1; i++) {
@@ -61,6 +85,16 @@ public class Pipeline {
         return data;
     }
 
+    /**
+     * It validates the pipeline based on the supported media types of the
+     * transformers in the pipe. It takes the supported output formats of a
+     * transformer and compares it with the supported input formats of the next,
+     * and so on. A pipeline is valid if all the transformers support at least
+     * one of the output media types of the previous transformer in the pipe as
+     * input type.
+     *
+     * @return true, if the pipeline is valid, otherwise return false
+     */
     public Boolean isValid() {
         Boolean accepts;
         Transformer t1, t2;
@@ -91,6 +125,12 @@ public class Pipeline {
         return true;
     }
 
+    /**
+     * Get accepted media types of the next transformer.
+     * 
+     * @param key index of the current transformer
+     * @return the array of the supported MimyTypes of the next transformer
+     */
     private MimeType[] getAcceptedMediaTypes(int key) {
         // get the next transformer
         Transformer t = transformers.get(key + 1);
