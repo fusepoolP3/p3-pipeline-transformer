@@ -23,11 +23,23 @@ public class Pipeline {
         index = 0;
     }
 
+    public Boolean isEmpty(){
+        return transformers.isEmpty();
+    }
+    
     public void addTransformer(Transformer transformer) {
         index = transformers.size();
         transformers.put(index, transformer);
     }
-    
+
+    public Set<MimeType> getSupportedInputFormats() {
+        return supportedInputFormats;
+    }
+
+    public Set<MimeType> getSupportedOutputFormats() {
+        return supportedOutputFormats;
+    }
+
     public void setSupportedFormats() {
         // set supported input formats of the pipeline to the supported input formats
         // of the first transformer in the pipeline
@@ -36,14 +48,7 @@ public class Pipeline {
         // of the last transformer in the pipeline
         supportedOutputFormats = transformers.get(index).getSupportedOutputFormats();
     }
-    
-    public void setSupportedFormats(Set<MimeType> _supportedInputFormats, Set<MimeType> _supportedOutputFormats) {
-        // set supported input formats of the pipeline explicitly
-        supportedInputFormats = _supportedInputFormats;
-        // set supported output formats of the pipeline explicitly
-        supportedOutputFormats = _supportedOutputFormats;
-    }
-    
+
     public Entity run(Entity data) {
         Transformer t;
         for (int i = 0; i < index + 1; i++) {
@@ -56,11 +61,11 @@ public class Pipeline {
         return data;
     }
 
-    public Boolean validate() {
+    public Boolean isValid() {
         Boolean accepts;
         Transformer t1, t2;
         // if there is more than one transformer in the pipeline
-        if(index > 0) {
+        if (index > 0) {
             for (int i = 0; i < index; i++) {
                 accepts = false;
                 t1 = transformers.get(i);
@@ -78,7 +83,7 @@ public class Pipeline {
                     }
                 }
                 // if no output format of t1 is accepted by t2 as input format
-                if(!accepts) {
+                if (!accepts) {
                     throw new RuntimeException("Incompatible transformers found in pipeline!");
                 }
             }

@@ -6,38 +6,91 @@ import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
  * @author Gabor
  */
 public class PipelineTransformer implements SyncTransformer {
-    
+
+    private HttpServletRequest request;
+    private Map<String, String> queryParams;
+    private Pipeline pipeline;
+
+    public PipelineTransformer(HttpServletRequest _request) {
+        request = _request;
+
+        // get query params from query string
+        queryParams = getQueryParams(request.getQueryString());
+
+        // query string must not be empty
+        if (queryParams.isEmpty()) {
+            throw new RuntimeException("Query string must contain at least one transformer!");
+        }
+
+        // create new pipeline did not exist before
+        if (pipeline == null) {
+            pipeline = new Pipeline();
+
+            Transformer transformer;
+            for (int i = 1; i <= queryParams.size(); i++) {
+                // get transformer URI from query params
+                String transformerURI = queryParams.get("t" + i);
+                // query param should not be empty or blank
+                if (StringUtils.isNotBlank(transformerURI)) {
+                    try {
+                        // decode transformer URI
+                        transformerURI = URLDecoder.decode(transformerURI, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // create transformer
+                    transformer = new TransformerClientImpl(transformerURI);
+                    // add transformer to pipeline
+                    pipeline.addTransformer(transformer);
+                }
+            }
+
+            if (!pipeline.isEmpty()) {
+                // set supported input and output formats of the pipeline transformer
+                pipeline.setSupportedFormats();
+
+                // validate pipeline
+                if (!pipeline.isValid()) {
+                    throw new RuntimeException("Incompatible transformers!");
+                }
+            } else {
+                throw new RuntimeException("Pipeline contains no transformer!");
+            }
+        }
+
+    }
+
     @Override
     public Entity transform(HttpRequestEntity entity) throws IOException {
         // get mimetype of content
         final MimeType mimeType = entity.getType();
+
         // convert content to byte array
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         IOUtils.copy(entity.getData(), baos);
         final byte[] bytes = baos.toByteArray();
+
         // create Entity from content
         final Entity input = new InputStreamEntity() {
-
             @Override
             public MimeType getType() {
                 return mimeType;
@@ -48,86 +101,39 @@ public class PipelineTransformer implements SyncTransformer {
                 return new ByteArrayInputStream(bytes);
             }
         };
-        // get query string
-        final String queryString = entity.getRequest().getQueryString();
-        
-        HashMap<String, String> queryParams = new HashMap<>();
-        // process query string
-        if (queryString != null) {
-            String[] params = queryString.split("&");
-            String[] param;
-            for (int i = 0; i < params.length; i++) {
-                param = params[i].split("=", 2);
-                queryParams.put(param[0], param[1]);
-            }
-        }
-        // get uri of config file
-        String uriString = queryParams.get("uri");
-        // config uri must be supplied
-        if (uriString == null) {
-            throw new RuntimeException("No list of transformers was supplied!");
-        }
-        // create pipeline
-        Pipeline pipeline = new Pipeline();
-        Transformer transformer;
-        URI uri;
-        // check if config file uri is valid
-        try {
-            uri = new URI(uriString);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("URI syntax error!", e);
-        }
-        // read config file
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(uri.toURL().openStream()))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    // create transformer
-                    transformer = new TransformerClientImpl(line);
-                    // add transformer to pipeline
-                    pipeline.addTransformer(transformer);
-                }
-            }
-        }
-        
-        // set supported input and output formats of the pipeline transformer
-        pipeline.setSupportedFormats();
-        
-        // validate pipeline
-        if(!pipeline.validate()){
-           throw new RuntimeException("Incompatible transformers!"); 
-        }
 
         // run pipeline
         final Entity output = pipeline.run(input);
-      
+
         return output;
     }
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {
-        try {
-            // TODO return supported input formats of first transformer 
-            MimeType mimeType = new MimeType("text/plain;charset=UTF-8");
-            return Collections.singleton(mimeType);
-        } catch (MimeTypeParseException e) {
-            throw new RuntimeException(e);
-        }
+        return pipeline.getSupportedInputFormats();
     }
-    
+
     @Override
     public Set<MimeType> getSupportedOutputFormats() {
-        try {
-            // TODO return supported input formats of last transformer
-            MimeType mimeType = new MimeType("text/plain;charset=UTF-8");
-            return Collections.singleton(mimeType);
-        } catch (MimeTypeParseException e) {
-            throw new RuntimeException(e);
-        }
+        return pipeline.getSupportedOutputFormats();
     }
 
     @Override
     public boolean isLongRunning() {
         return false;
+    }
+
+    private Map<String, String> getQueryParams(String queryString) {
+        Map<String, String> temp = new HashMap<>();
+        // query string should not be empty or blank
+        if (StringUtils.isNotBlank(queryString)) {
+            String[] params = queryString.split("&");
+            String[] param;
+            for (int i = 0; i < params.length; i++) {
+                param = params[i].split("=", 2);
+                temp.put(param[0], param[1]);
+            }
+        }
+        return temp;
     }
 }
