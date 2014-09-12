@@ -2,13 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>eu.fusepoolp3</groupId>
+    <groupId>eu.fusepool.p3</groupId>
     <artifactId>p3-pipeline-transformer</artifactId>
+    <name>Fusepool P3 Platform: Pipeline Transformer</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Fusepool P3 Platform: Pipeline Transformer</name>
-  
     <build>
         <pluginManagement>
             <plugins>
@@ -139,6 +138,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <main.class>eu.fusepoolp3.pipelinetransformer.Main</main.class>
+        <main.class>eu.fusepool.p3.transformer.pipeline.Main</main.class>
     </properties>
 </project>

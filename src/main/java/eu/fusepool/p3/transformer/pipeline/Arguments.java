@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package eu.fusepoolp3.p3pipelinetrasformer;
+package eu.fusepool.p3.transformer.pipeline;
 
 import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
 import org.wymiwyg.commons.util.arguments.CommandLine;

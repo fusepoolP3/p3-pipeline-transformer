@@ -1,4 +1,4 @@
-package eu.fusepoolp3.p3pipelinetrasformer;
+package eu.fusepool.p3.transformer.pipeline;
 
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.commons.Entity;

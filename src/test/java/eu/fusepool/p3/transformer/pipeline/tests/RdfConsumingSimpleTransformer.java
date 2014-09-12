@@ -1,4 +1,4 @@
-package eu.fusepoolp3.p3pipelinetrasformer.tests;
+package eu.fusepool.p3.transformer.pipeline.tests;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.sample.SimpleTransformer;

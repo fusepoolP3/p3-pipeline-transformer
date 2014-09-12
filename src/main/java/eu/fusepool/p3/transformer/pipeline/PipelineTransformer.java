@@ -1,4 +1,4 @@
-package eu.fusepoolp3.p3pipelinetrasformer;
+package eu.fusepool.p3.transformer.pipeline;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.SyncTransformer;

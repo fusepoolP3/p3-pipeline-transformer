@@ -1,4 +1,4 @@
-package eu.fusepoolp3.p3pipelinetrasformer.tests;
+package eu.fusepool.p3.transformer.pipeline.tests;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
@@ -6,7 +6,7 @@ import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.sample.SimpleTransformer;
 import eu.fusepool.p3.transformer.server.TransformerServer;
-import eu.fusepoolp3.p3pipelinetrasformer.PipelineTransformer;
+import eu.fusepool.p3.transformer.pipeline.PipelineTransformer;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.URLDecoder;
