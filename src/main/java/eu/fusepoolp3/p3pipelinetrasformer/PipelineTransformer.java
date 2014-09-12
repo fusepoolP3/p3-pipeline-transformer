@@ -35,10 +35,10 @@ public class PipelineTransformer implements SyncTransformer {
 
         // query string must not be empty
         if (queryParams.isEmpty()) {
-            throw new RuntimeException("Query string must contain at least one transformer!");
+            throw new RuntimeException("Query string must not be empty!");
         }
 
-        // create new pipeline did not exist before
+        // create new pipeline if it does not exist
         if (pipeline == null) {
             pipeline = new Pipeline();
 
