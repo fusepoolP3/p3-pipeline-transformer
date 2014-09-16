@@ -4,13 +4,11 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
-import eu.fusepool.p3.transformer.sample.SimpleTransformer;
-import eu.fusepool.p3.transformer.server.TransformerServer;
 import eu.fusepool.p3.transformer.pipeline.PipelineTransformer;
+import eu.fusepool.p3.transformer.sample.LongRunningTransformer;
+import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.clerezza.rdf.core.BNode;
@@ -29,19 +27,19 @@ import org.junit.Test;
  * Unit test for Pipeline Transformer. It creates two transformers that have
  * compatible input and output media types and runs them in a pipeline.
  */
-public class TransformerTest {
+public class LongRunningTransformerTest {
 
     private String baseURI, transformerURI1, transformerURI2;
 
     @Before
     public void setUp() throws Exception {
-        // set up first transformer which consumes text/plain and produces text/turtle
+        // set up first transformer (LONGRUNNING) which consumes text/plain and produces text/turtle
         int port = findFreePort();
         transformerURI1 = "http://localhost:" + port + "/";
         TransformerServer server = new TransformerServer(port);
-        server.start(new SimpleTransformer());
+        server.start(new LongRunningTransformer());
 
-        // set up second transformer which consumes text/turtle and produces text/turtle
+        // set up second transformer (SYNC) which consumes text/turtle and produces text/turtle
         port = findFreePort();
         transformerURI2 = "http://localhost:" + port + "/";
         server = new TransformerServer(port);
@@ -72,7 +70,7 @@ public class TransformerTest {
                 .contentType("text/plain;charset=UTF-8")
                 .content("hello")
                 .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
-                .post(baseURI + "?t1=" + transformerURI1 + "&t2=" + transformerURI2);
+                .post(baseURI + "?t1=" + transformerURI1 + "&t2=" + transformerURI2);   
         Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         Iterator<Triple> typeTriples = graph.filter(null, RDF.type,
                 new UriRef("http://example.org/ontology#TextualContent"));

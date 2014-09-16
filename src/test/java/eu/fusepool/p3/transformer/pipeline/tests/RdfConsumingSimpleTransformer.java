@@ -1,7 +1,7 @@
 package eu.fusepool.p3.transformer.pipeline.tests;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.sample.SimpleTransformer;
+import eu.fusepool.p3.transformer.RdfGeneratingTransformer;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -22,14 +22,14 @@ import org.apache.clerezza.rdf.ontologies.SIOC;
 import org.apache.clerezza.rdf.utils.GraphNode;
 
 /**
- * This class extends a SimpleTransformer to have a transformer that can
+ * This class extends a RdfGeneratingTransformer to have a transformer that can
  * digest turtle as input format (which is the output of a SimpleTransformer),
  * and thus pipelining multiple transformers for testing wouldn't produce 
  * incompatible transformers error.
  *
  * @author Gabor
  */
-public class RdfConsumingSimpleTransformer extends SimpleTransformer {
+public class RdfConsumingSimpleTransformer extends RdfGeneratingTransformer {
 
     public static final UriRef TEXUAL_CONTENT = new UriRef("http://example.org/ontology#TextualContent");
 
@@ -60,7 +60,7 @@ public class RdfConsumingSimpleTransformer extends SimpleTransformer {
             Literal literal = (Literal) triples.next().getObject();
             text = literal.getLexicalForm();
         }
-        
+
         final TripleCollection result = new SimpleMGraph();
         final Resource resource = entity.getContentLocation() == null
                 ? new BNode()
