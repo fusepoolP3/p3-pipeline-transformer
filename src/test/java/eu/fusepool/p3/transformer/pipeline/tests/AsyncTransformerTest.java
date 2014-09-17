@@ -31,7 +31,7 @@ import org.junit.Test;
 public class AsyncTransformerTest {
 
     private String baseURI, transformerURI1, transformerURI2, transformerURI3;
-
+    /*
     @Before
     public void setUp() throws Exception {
         // set up first transformer (ASYNC) which consumes text/plain and produces text/plain
@@ -85,7 +85,7 @@ public class AsyncTransformerTest {
         Resource textDescription = typeTriples.next().getSubject();
         Assert.assertTrue("TextDescription resource is not a BNode", textDescription instanceof BNode);
     }
-
+    */
     public static int findFreePort() {
         int port = 0;
         try (ServerSocket server = new ServerSocket(0);) {
