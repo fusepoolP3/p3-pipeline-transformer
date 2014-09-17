@@ -30,7 +30,7 @@ import org.junit.Test;
 public class LongRunningTransformerTest {
 
     private String baseURI, transformerURI1, transformerURI2;
-
+    /*
     @Before
     public void setUp() throws Exception {
         // set up first transformer (LONGRUNNING) which consumes text/plain and produces text/turtle
@@ -78,7 +78,7 @@ public class LongRunningTransformerTest {
         Resource textDescription = typeTriples.next().getSubject();
         Assert.assertTrue("TextDescription resource is not a BNode", textDescription instanceof BNode);
     }
-
+    */
     public static int findFreePort() {
         int port = 0;
         try (ServerSocket server = new ServerSocket(0);) {
