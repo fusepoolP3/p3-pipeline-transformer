@@ -1,1 +1,11 @@
 language: java
+before_install: mvn install -DskipTests=true -DfinalName=pipeline-transformer-$TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: JzaFz60+JGg4wBS4PY6tHChiluozrtsUJsS+iM0/fVuSsr/LgBXDE6AvvHBV8WJSrls196yZCSvzsyeniGQDLF0WencpG+4HKrcrMLSRxiQg7gS7GiqIcmSARSFzzw7kdGQG9dorcymaF0ygdEXlk+GBtN5FliK4TMKKH/uvWQI=
+  file: target/pipeline-transformer-$TRAVIS_TAG-jar-with-dependencies.jar
+  on:
+    repo: fusepoolP3/p3-pipeline-transformer
+    tags: true
+    all_branches: true
