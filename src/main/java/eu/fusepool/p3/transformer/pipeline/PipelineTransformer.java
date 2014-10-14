@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -28,6 +29,7 @@ public class PipelineTransformer implements SyncTransformer {
 
     private Map<String, String> queryParams;
     private Pipeline pipeline;
+    private MimeType accepts;
 
     public PipelineTransformer(String queryString) {
         // get query params from query string
@@ -100,7 +102,7 @@ public class PipelineTransformer implements SyncTransformer {
         };
 
         // run pipeline
-        final Entity output = pipeline.run(input);
+        final Entity output = pipeline.run(input, accepts);
 
         return output;
     }
@@ -138,5 +140,20 @@ public class PipelineTransformer implements SyncTransformer {
             }
         }
         return temp;
+    }
+    
+    /**
+     * TODO: handle multiple media types with quality factor associated
+     * 
+     * Sets the accept header for the pipeline transformer.
+     * @param header Accept header.
+     */
+    public void setAcceptHeader(String accepts) {
+        try {
+            this.accepts = new MimeType(accepts);
+        } catch (MimeTypeParseException e) {
+            // if accept header cannot be parsed
+            this.accepts = null;
+        }
     }
 }

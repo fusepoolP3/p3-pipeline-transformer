@@ -33,7 +33,7 @@ public class Main {
         server.start(
                 new TransformerFactory() {
                     @Override
-                    public Transformer getTransformer(HttpServletRequest request) {
+                    public Transformer getTransformer(HttpServletRequest request) {                      
                         if (StringUtils.isNotEmpty(request.getQueryString())) {
                             PipelineTransformer pipelineTransformer = pipelines.get(request.getQueryString());
                             // if pipeline transformer is not found in cache
@@ -43,6 +43,9 @@ public class Main {
                                 // put the pipeline transformer in the cache 
                                 pipelines.put(request.getQueryString(), pipelineTransformer);
                             }
+                            // set accept header for pipeline
+                            pipelineTransformer.setAcceptHeader(request.getHeader("Accept"));
+                            
                             return pipelineTransformer;
                         }
                         else{

@@ -52,7 +52,9 @@ public class SyncTransformerTest {
         server.start(new TransformerFactory() {
             @Override
             public Transformer getTransformer(HttpServletRequest request) {
-                return new PipelineTransformer(request.getQueryString());
+                PipelineTransformer pipelineTransformer = new PipelineTransformer(request.getQueryString());
+                pipelineTransformer.setAcceptHeader(request.getHeader("Accept"));
+                return pipelineTransformer;
             }
         });
     }

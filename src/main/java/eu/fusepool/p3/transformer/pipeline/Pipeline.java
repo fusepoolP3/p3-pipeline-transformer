@@ -9,7 +9,7 @@ import javax.activation.MimeType;
 
 /**
  * This class represents a pipeline for applying transformers in sequence.
- * 
+ *
  * @author Gabor
  */
 public class Pipeline {
@@ -17,24 +17,22 @@ public class Pipeline {
     private Set<MimeType> supportedInputFormats;
     private Set<MimeType> supportedOutputFormats;
     private Map<Integer, Transformer> transformers;
-    private int index;
 
     public Pipeline() {
         transformers = new HashMap<>();
-        index = 0;
     }
 
     /**
      * Checks if there is any transformer in the pipeline.
-     * @return 
+     *
+     * @return
      */
     public Boolean isEmpty() {
         return transformers.isEmpty();
     }
 
     public void addTransformer(Transformer transformer) {
-        index = transformers.size();
-        transformers.put(index, transformer);
+        transformers.put(transformers.size(), transformer);
     }
 
     /**
@@ -60,7 +58,7 @@ public class Pipeline {
         supportedInputFormats = transformers.get(0).getSupportedInputFormats();
         // set supported output formats of the pipeline to the supported output formats
         // of the last transformer in the pipeline
-        supportedOutputFormats = transformers.get(index).getSupportedOutputFormats();
+        supportedOutputFormats = transformers.get(transformers.size() - 1).getSupportedOutputFormats();
     }
 
     /**
@@ -70,17 +68,34 @@ public class Pipeline {
      * the pipeline transformer. The output of the last transformer in the pipe
      * is the output of the pipeline.
      *
-     * @param data original Entity posted to the pipeline transformer
+     * @param data the original Entity posted to the pipeline transformer
+     * @param accepts the accept header for the last transformer
      * @return the Entity that is the output of the last transformer in the pipe
      */
-    public Entity run(Entity data) {
-        Transformer t;
-        for (int i = 0; i < index + 1; i++) {
-            t = transformers.get(i);
-            if (t == null) {
-                throw new RuntimeException("Transformer cannot be null!");
+    public Entity run(Entity data, MimeType accepts) {
+        Transformer current, next;
+        MimeType[] acceptedMediaTypes;
+        for (int i = 0; i < transformers.size(); i++) {
+            // get the current transformer in the pipeline
+            current = transformers.get(i);
+            // get the next transformer in the pipeline
+            next = transformers.get(i + 1);
+
+            if (next != null) {
+                // next is not null, set the accepted input formats of the next transformer
+                acceptedMediaTypes = next.getSupportedInputFormats().toArray(new MimeType[next.getSupportedInputFormats().size()]);
+            } else {
+                // if next is null, there is no more transformer in the pipeline
+                if (accepts != null) {
+                    // if accepts is not null, set accepted mediatype explictly
+                    acceptedMediaTypes = new MimeType[] { accepts };
+                } else {
+                    // otherwise use the accepted mediatypes from the last transformer
+                    acceptedMediaTypes = supportedOutputFormats.toArray(new MimeType[supportedOutputFormats.size()]);
+                }   
             }
-            data = t.transform(data, getAcceptedMediaTypes(i));
+
+            data = current.transform(data, acceptedMediaTypes);
         }
         return data;
     }
@@ -96,53 +111,32 @@ public class Pipeline {
      * @return true, if the pipeline is valid, otherwise return false
      */
     public Boolean isValid() {
-        Boolean accepts;
-        Transformer t1, t2;
+        Boolean valid;
+        Transformer current, next;
         // if there is more than one transformer in the pipeline
-        if (index > 0) {
-            for (int i = 0; i < index; i++) {
-                accepts = false;
-                t1 = transformers.get(i);
-                t2 = transformers.get(i + 1);
-                // t1, t2 cannot be null if there is more than one transformer
-                // in the pipeline
-                if (t1 == null || t2 == null) {
-                    throw new RuntimeException("Transformer cannot be null!");
+        if (transformers.size() > 1) {
+            for (int i = 0; i < transformers.size(); i++) {
+                valid = false;
+                current = transformers.get(i);
+                next = transformers.get(i + 1);
+                
+                // if next is null, current is the last transformer in the pipeline
+                if (next == null) {
+                    break;
                 }
-                // loop through the supported output formats of t1 and check if
-                // t2 accepts any of them
-                for (MimeType mimeType : t1.getSupportedOutputFormats()) {
-                    if (t2.accepts(mimeType)) {
-                        accepts = true;
+                // loop through the supported output formats of current and check if
+                // next valid any of them
+                for (MimeType mimeType : current.getSupportedOutputFormats()) {
+                    if (next.accepts(mimeType)) {
+                        valid = true;
                     }
                 }
-                // if no output format of t1 is accepted by t2 as input format
-                if (!accepts) {
+                // if no output format of current is accepted by next as input format
+                if (!valid) {
                     throw new RuntimeException("Incompatible transformers found in pipeline!");
                 }
             }
         }
         return true;
-    }
-
-    /**
-     * Get accepted media types of the next transformer.
-     * 
-     * @param key index of the current transformer
-     * @return the array of the supported MimyTypes of the next transformer
-     */
-    private MimeType[] getAcceptedMediaTypes(int key) {
-        // get the next transformer
-        Transformer t = transformers.get(key + 1);
-
-        if (t != null) {
-            // t is not null, t is the next transformer in the pipeline,
-            // return the accepted input formats of the next transformer
-            return t.getSupportedInputFormats().toArray(new MimeType[t.getSupportedInputFormats().size()]);
-        } else {
-            // if t is null, there is no more transformer in the pipeline, 
-            // return the output accepted formats of the pipeline transformer itself
-            return supportedOutputFormats.toArray(new MimeType[supportedOutputFormats.size()]);
-        }
     }
 }
