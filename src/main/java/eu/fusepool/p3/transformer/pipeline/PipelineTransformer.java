@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +89,9 @@ public class PipelineTransformer implements SyncTransformer {
         IOUtils.copy(entity.getData(), baos);
         final byte[] bytes = baos.toByteArray();
 
+        // get content location header
+        final URI contentLocation = entity.getContentLocation();
+        
         // create Entity from content
         final Entity input = new InputStreamEntity() {
             @Override
@@ -98,6 +102,11 @@ public class PipelineTransformer implements SyncTransformer {
             @Override
             public InputStream getData() throws IOException {
                 return new ByteArrayInputStream(bytes);
+            }
+            
+            @Override
+            public URI getContentLocation() {
+                return contentLocation;
             }
         };
 

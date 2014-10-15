@@ -94,8 +94,9 @@ public class Pipeline {
                     acceptedMediaTypes = supportedOutputFormats.toArray(new MimeType[supportedOutputFormats.size()]);
                 }   
             }
-
+            System.out.println("Pipeline Input Content-Location (" + i + "): " + data.getContentLocation());
             data = current.transform(data, acceptedMediaTypes);
+            System.out.println("Pipeline Output Content-Location (" + i + "): " + data.getContentLocation());
         }
         return data;
     }
