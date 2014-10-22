@@ -23,22 +23,34 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * This class represents a pipeline transformer.
- * 
+ *
  * @author Gabor
  */
 public class PipelineTransformer implements SyncTransformer {
 
     private Map<String, String> queryParams;
     private Pipeline pipeline;
-    private MimeType accepts;
+    private MimeType accept;
 
-    public PipelineTransformer(String queryString) {
+    public PipelineTransformer(String queryString, String acceptHeader) {
         // get query params from query string
         queryParams = getQueryParams(queryString);
 
         // query string must not be empty
         if (queryParams.isEmpty()) {
             throw new RuntimeException("Query string must not be empty!");
+        }
+
+        // simple parsing of accept header
+        try {
+            System.out.println(acceptHeader);
+            String[] types = acceptHeader.split(",");
+            System.out.println(types[0]);
+            String[] params = types[0].split(";");
+            System.out.println(params[0]);
+            accept = new MimeType(params[0]);
+        } catch (MimeTypeParseException ex) {
+            accept = null;
         }
 
         // create new pipeline if it does not exist
@@ -91,7 +103,7 @@ public class PipelineTransformer implements SyncTransformer {
 
         // get content location header
         final URI contentLocation = entity.getContentLocation();
-        
+
         // create Entity from content
         final Entity input = new InputStreamEntity() {
             @Override
@@ -103,7 +115,7 @@ public class PipelineTransformer implements SyncTransformer {
             public InputStream getData() throws IOException {
                 return new ByteArrayInputStream(bytes);
             }
-            
+
             @Override
             public URI getContentLocation() {
                 return contentLocation;
@@ -111,7 +123,7 @@ public class PipelineTransformer implements SyncTransformer {
         };
 
         // run pipeline
-        final Entity output = pipeline.run(input, accepts);
+        final Entity output = pipeline.run(input, accept);
 
         return output;
     }
@@ -133,7 +145,7 @@ public class PipelineTransformer implements SyncTransformer {
 
     /**
      * Get query parameters from a query string.
-     * 
+     *
      * @param queryString the query string
      * @return HashMap containing the query parameters
      */
@@ -143,26 +155,11 @@ public class PipelineTransformer implements SyncTransformer {
         if (StringUtils.isNotBlank(queryString)) {
             String[] params = queryString.split("&");
             String[] param;
-            for (int i = 0; i < params.length; i++) {
-                param = params[i].split("=", 2);
+            for (String item : params) {
+                param = item.split("=", 2);
                 temp.put(param[0], param[1]);
             }
         }
         return temp;
-    }
-    
-    /**
-     * TODO: handle multiple media types with quality factor associated
-     * 
-     * Sets the accept header for the pipeline transformer.
-     * @param header Accept header.
-     */
-    public void setAcceptHeader(String accepts) {
-        try {
-            this.accepts = new MimeType(accepts);
-        } catch (MimeTypeParseException e) {
-            // if accept header cannot be parsed
-            this.accepts = null;
-        }
     }
 }

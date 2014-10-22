@@ -33,24 +33,22 @@ public class Main {
         server.start(
                 new TransformerFactory() {
                     @Override
-                    public Transformer getTransformer(HttpServletRequest request) {                      
+                    public Transformer getTransformer(HttpServletRequest request) {
                         if (StringUtils.isNotEmpty(request.getQueryString())) {
-                            PipelineTransformer pipelineTransformer = pipelines.get(request.getQueryString());
+                            String key = request.getQueryString() + request.getHeader("Accept");
+                            PipelineTransformer pipelineTransformer = pipelines.get(key);
                             // if pipeline transformer is not found in cache
-                            if(pipelineTransformer == null){
+                            if (pipelineTransformer == null) {
                                 // create a new  pipeline transformer
-                                pipelineTransformer = new PipelineTransformer(request.getQueryString());
-                                // put the pipeline transformer in the cache 
+                                pipelineTransformer = new PipelineTransformer(request.getQueryString(), request.getHeader("Accept"));
+                                // put the pipeline transformer in the cache
                                 pipelines.put(request.getQueryString(), pipelineTransformer);
                             }
-                            // set accept header for pipeline
-                            pipelineTransformer.setAcceptHeader(request.getHeader("Accept"));
-                            
+
                             return pipelineTransformer;
-                        }
-                        else{
+                        } else {
                             throw new RuntimeException("Query string must not be empty!");
-                        } 
+                        }
                     }
                 });
 
