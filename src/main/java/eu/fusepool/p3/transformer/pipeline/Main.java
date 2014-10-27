@@ -1,11 +1,13 @@
 package eu.fusepool.p3.transformer.pipeline;
 
 import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
@@ -47,7 +49,7 @@ public class Main {
 
                             return pipelineTransformer;
                         } else {
-                            throw new RuntimeException("Query string must not be empty!");
+                            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Query string must not be empty!");
                         }
                     }
                 });

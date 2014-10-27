@@ -2,6 +2,7 @@ package eu.fusepool.p3.transformer.pipeline;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.SyncTransformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -38,16 +40,13 @@ public class PipelineTransformer implements SyncTransformer {
 
         // query string must not be empty
         if (queryParams.isEmpty()) {
-            throw new RuntimeException("Query string must not be empty!");
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Query string must not be empty!");
         }
 
         // simple parsing of accept header
         try {
-            System.out.println(acceptHeader);
             String[] types = acceptHeader.split(",");
-            System.out.println(types[0]);
             String[] params = types[0].split(";");
-            System.out.println(params[0]);
             accept = new MimeType(params[0]);
         } catch (MimeTypeParseException ex) {
             accept = null;
@@ -82,11 +81,11 @@ public class PipelineTransformer implements SyncTransformer {
 
                 // validate pipeline
                 if (!pipeline.isValid()) {
-                    throw new RuntimeException("Incompatible transformers!");
+                    throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Incompatible transformers!");
                 }
             } else {
                 // the pipeline should contain at least on transformer
-                throw new RuntimeException("Pipeline contains no transformer!");
+                throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Pipeline contains no transformer!");
             }
         }
     }
