@@ -1,5 +1,6 @@
 package eu.fusepool.p3.transformer.pipeline;
 
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.WritingEntity;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -77,7 +79,11 @@ public class Pipeline {
     }
 
     /**
-     * It runs the pipeline by invoking the transform method of each transformer in the pipe in order, and supplying the output of each transformer to the next. The first transformer gets the Entity that was originally posted to the pipeline transformer. The output of the last transformer in the pipe is the output of the pipeline.
+     * It runs the pipeline by invoking the transform method of each transformer
+     * in the pipe in order, and supplying the output of each transformer to the
+     * next. The first transformer gets the Entity that was originally posted to
+     * the pipeline transformer. The output of the last transformer in the pipe
+     * is the output of the pipeline.
      *
      * @param data the original Entity posted to the pipeline transformer
      * @param accept the accept header for the last transformer
@@ -135,7 +141,12 @@ public class Pipeline {
     }
 
     /**
-     * It validates the pipeline based on the supported media types of the transformers in the pipe. It takes the supported output formats of a transformer and compares it with the supported input formats of the next, and so on. A pipeline is valid if all the transformers support at least one of the output media types of the previous transformer in the pipe as input type.
+     * It validates the pipeline based on the supported media types of the
+     * transformers in the pipe. It takes the supported output formats of a
+     * transformer and compares it with the supported input formats of the next,
+     * and so on. A pipeline is valid if all the transformers support at least
+     * one of the output media types of the previous transformer in the pipe as
+     * input type.
      *
      * @return true, if the pipeline is valid, otherwise return false
      */
@@ -162,7 +173,7 @@ public class Pipeline {
                 }
                 // if no output format of current is accepted by next as input format
                 if (!valid) {
-                    throw new RuntimeException("Incompatible transformers found in pipeline!");
+                    throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Incompatible transformers found in pipeline!");
                 }
             }
         }

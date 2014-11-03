@@ -18,7 +18,8 @@ import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.commons.io.IOUtils;
 
 /**
- * A simple transformer for junit tests. It expects text/plain and produces text/turtle.
+ * A simple transformer for junit tests. It expects text/plain and produces
+ * text/turtle.
  *
  * @author Gabor
  */

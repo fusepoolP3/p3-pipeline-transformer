@@ -65,7 +65,7 @@ public class SyncTransformerTest {
     public void turtleOnGet() throws UnsupportedEncodingException {
         Response response = RestAssured.given().header("Accept", "text/turtle")
                 .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
-                .get(baseURI + "?t1=" + transformerURI0 + "&t2=" + transformerURI1 + "&t3=" + transformerURI2);
+                .get(baseURI + "?t=" + transformerURI0 + "&t=" + transformerURI1 + "&t=" + transformerURI2);
         Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         System.out.println(graph.toString());
     }
@@ -78,7 +78,7 @@ public class SyncTransformerTest {
                 .contentType("text/plain;charset=UTF-8")
                 .content("hello")
                 .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
-                .post(baseURI + "?t1=" + transformerURI0 + "&t2=" + transformerURI1 + "&t3=" + transformerURI2);
+                .post(baseURI + "?t=" + transformerURI0 + "&t=" + transformerURI1 + "&t=" + transformerURI2);
         Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         Assert.assertTrue("Result doesn't contain originally posted text", graph.toString().contains("hello"));
     }

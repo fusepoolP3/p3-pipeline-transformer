@@ -33,6 +33,7 @@ public class PipelineTransformer implements SyncTransformer {
     private Map<String, String> queryParams;
     private Pipeline pipeline;
     private MimeType accept;
+    private int index;
 
     public PipelineTransformer(String queryString, String acceptHeader) {
         // get query params from query string
@@ -56,7 +57,7 @@ public class PipelineTransformer implements SyncTransformer {
             pipeline = new Pipeline();
 
             Transformer transformer;
-            for (int i = 1; i <= queryParams.size(); i++) {
+            for (int i = 1; i <= index; i++) {
                 // get transformer URI from query params
                 String transformerURI = queryParams.get("t" + i);
                 // query param should not be empty or blank
@@ -153,8 +154,10 @@ public class PipelineTransformer implements SyncTransformer {
         if (StringUtils.isNotBlank(queryString)) {
             String[] params = queryString.split("&");
             String[] param;
+            index = 0;
             for (String item : params) {
                 param = item.split("=", 2);
+                param[0] += param[0].equals("t") ? ++index : "";
                 temp.put(param[0], param[1]);
             }
         }

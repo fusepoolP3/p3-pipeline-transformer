@@ -14,7 +14,8 @@ import javax.activation.MimeTypeParseException;
 import org.apache.commons.io.IOUtils;
 
 /**
- * A simple transformer for junit tests. It expects text/plain and produces text/plain.
+ * A simple transformer for junit tests. It expects text/plain and produces
+ * text/plain.
  *
  * @author Gabor
  */

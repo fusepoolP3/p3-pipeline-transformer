@@ -22,7 +22,9 @@ import org.apache.clerezza.rdf.ontologies.SIOC;
 import org.apache.clerezza.rdf.utils.GraphNode;
 
 /**
- * This class extends a RdfGeneratingTransformer to have a transformer that can digest turtle as input format, and thus pipelining multiple transformers for testing wouldn't produce incompatible transformers error.
+ * This class extends a RdfGeneratingTransformer to have a transformer that can
+ * digest turtle as input format, and thus pipelining multiple transformers for
+ * testing wouldn't produce incompatible transformers error.
  *
  * @author Gabor
  */
