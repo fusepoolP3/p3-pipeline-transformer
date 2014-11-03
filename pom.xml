@@ -5,7 +5,7 @@
     <groupId>eu.fusepool.p3</groupId>
     <artifactId>p3-pipeline-transformer</artifactId>
     <name>Fusepool P3 Platform: Pipeline Transformer</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>eu.fusepool.p3</groupId>
             <artifactId>transformer-implementation-library</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>eu.fusepool.p3</groupId>
@@ -128,6 +128,12 @@
             <artifactId>httpcore</artifactId>
             <version>4.2.4</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <repositories>

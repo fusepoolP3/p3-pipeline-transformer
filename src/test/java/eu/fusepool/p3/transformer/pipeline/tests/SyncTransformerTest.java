@@ -20,7 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for Pipeline Transformer. It creates two transformers that have compatible input and output media types and runs them in a pipeline.
+ * Unit test for Pipeline Transformer. It creates two transformers that have
+ * compatible input and output media types and runs them in a pipeline.
  */
 public class SyncTransformerTest {
 
@@ -72,7 +73,7 @@ public class SyncTransformerTest {
     @Test
     public void turtlePost() {
         Response response = RestAssured.given()
-                .header("Accept", "application/x-turtle; q=0.8, application/rdf+xml; q=0.7")
+                .header("Accept", "application/x-turtle; q=0.8, application/rdf+xml; q=0.9, text/turtle; q=1.0")
                 .header("Content-Location", "http://example.com/test1")
                 .contentType("text/plain;charset=UTF-8")
                 .content("hello")
