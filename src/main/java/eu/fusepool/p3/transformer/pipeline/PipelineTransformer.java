@@ -41,7 +41,7 @@ public class PipelineTransformer implements SyncTransformer {
 
         // query string must not be empty
         if (queryParams.isEmpty()) {
-            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Query string must not be empty!");
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No valid query param found! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
         }
 
         // parsing of accept header
@@ -80,12 +80,10 @@ public class PipelineTransformer implements SyncTransformer {
                 pipeline.setSupportedFormats();
 
                 // validate pipeline
-                if (!pipeline.isValid()) {
-                    throw new TransformerException(HttpServletResponse.SC_PRECONDITION_FAILED, "Incompatible transformers!");
-                }
+                pipeline.validate();
             } else {
                 // the pipeline should contain at least on transformer
-                throw new TransformerException(HttpServletResponse.SC_PRECONDITION_FAILED, "Pipeline contains no transformer!");
+                throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string contains no transformer! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
             }
         }
     }
@@ -149,18 +147,22 @@ public class PipelineTransformer implements SyncTransformer {
      * @return HashMap containing the query parameters
      */
     private Map<String, String> getQueryParams(String queryString) {
-        Map<String, String> temp = new HashMap<>();
-        // query string should not be empty or blank
-        if (StringUtils.isNotBlank(queryString)) {
-            String[] params = queryString.split("&");
-            String[] param;
-            index = 0;
-            for (String item : params) {
-                param = item.split("=", 2);
-                param[0] += param[0].equals("t") ? ++index : "";
-                temp.put(param[0], param[1]);
+        try {
+            Map<String, String> temp = new HashMap<>();
+            // query string should not be empty or blank
+            if (StringUtils.isNotBlank(queryString)) {
+                String[] params = queryString.split("&");
+                String[] param;
+                index = 0;
+                for (String item : params) {
+                    param = item.split("=", 2);
+                    param[0] += param[0].equals("t") ? ++index : "";
+                    temp.put(param[0], param[1]);
+                }
             }
+            return temp;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Failed to parse query string!\nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
         }
-        return temp;
     }
 }

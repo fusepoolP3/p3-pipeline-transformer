@@ -27,7 +27,7 @@ public class Main {
      * @throws Exception
      */
     private static void start(Arguments arguments) throws Exception {
-        TransformerServer server = new TransformerServer(arguments.getPort());
+        TransformerServer server = new TransformerServer(arguments.getPort(), true);
 
         // Map for caching pipeline transformers based on the query string
         final Map<String, PipelineTransformer> pipelines = new HashMap<>();
@@ -49,7 +49,7 @@ public class Main {
 
                             return pipelineTransformer;
                         } else {
-                            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Query string must not be empty!");
+                            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string must not be emtpy! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
                         }
                     }
                 });

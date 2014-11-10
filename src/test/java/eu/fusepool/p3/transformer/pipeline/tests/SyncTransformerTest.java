@@ -33,25 +33,25 @@ public class SyncTransformerTest {
         // set up test transformer for testing content location
         int port = findFreePort();
         transformerURI0 = "http://localhost:" + port + "/";
-        TransformerServer server = new TransformerServer(port);
+        TransformerServer server = new TransformerServer(port, false);
         server.start(new SimpleTransformer());
 
         // set up first transformer (SYNC) which consumes text/plain and produces text/turtle
         port = findFreePort();
         transformerURI1 = "http://localhost:" + port + "/";
-        server = new TransformerServer(port);
+        server = new TransformerServer(port, false);
         server.start(new SimpleRdfProducingTransformer());
 
         // set up second transformer (SYNC) which consumes text/turtle and produces text/turtle
         port = findFreePort();
         transformerURI2 = "http://localhost:" + port + "/";
-        server = new TransformerServer(port);
+        server = new TransformerServer(port, false);
         server.start(new SimpleRdfConsumingTransformer());
 
         // set up pipeline transformer
         port = findFreePort();
         baseURI = "http://localhost:" + port + "/";
-        server = new TransformerServer(port);
+        server = new TransformerServer(port, false);
         server.start(new TransformerFactory() {
             @Override
             public Transformer getTransformer(HttpServletRequest request) {

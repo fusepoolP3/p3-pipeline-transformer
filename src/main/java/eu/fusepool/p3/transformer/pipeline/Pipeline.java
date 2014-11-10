@@ -147,10 +147,8 @@ public class Pipeline {
      * and so on. A pipeline is valid if all the transformers support at least
      * one of the output media types of the previous transformer in the pipe as
      * input type.
-     *
-     * @return true, if the pipeline is valid, otherwise return false
      */
-    public Boolean isValid() {
+    public void validate() {
         Boolean valid;
         Transformer current, next;
         // if there is more than one transformer in the pipeline
@@ -173,10 +171,10 @@ public class Pipeline {
                 }
                 // if no output format of current is accepted by next as input format
                 if (!valid) {
-                    throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Incompatible transformers found in pipeline!");
+                    throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Incompatible transformers found in pipeline!"
+                            + "\nReason: Transformer " + (i + 2) + ". does not accept the any of the supported output formats of transformer " + (i + 1) + ".");
                 }
             }
         }
-        return true;
     }
 }
