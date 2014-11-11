@@ -9,9 +9,17 @@ Clone the repository to your local machine
 
     git clone https://github.com/fusepoolP3/p3-pipeline-transformer.git
 
-Compile and run with
+Compile the application with
 
-    mvn clean install exec:java
+    mvn clean install
+
+Start the application with
+
+    mvn exec:java
+
+Or start the application with parameters (-P sets the port, -C enables CORS)
+
+    mvn exec:java -Dexec.args="-P 7100 -C"
 
 ###Usage
 
