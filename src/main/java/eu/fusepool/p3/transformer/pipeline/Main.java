@@ -49,7 +49,7 @@ public class Main {
 
                             return pipelineTransformer;
                         } else {
-                            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string must not be emtpy! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
+                            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string must not be empty! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
                         }
                     }
                 });
