@@ -17,7 +17,7 @@ Start the application with
 
     mvn exec:java
 
-Or start the application with parameters (-P sets the port, -C enables CORS)
+Or start the application with parameters (`-P` sets the port, `-C` enables CORS)
 
     mvn exec:java -Dexec.args="-P 7100 -C"
 
