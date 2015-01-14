@@ -1,4 +1,4 @@
-Pipeline transformer
+Pipeline transformer [![Build Status](https://travis-ci.org/fusepoolP3/p3-pipeline-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-pipeline-transformer)
 ====================
 
 The pipeline transformer is a series of connected data transformation elements, called transformers, where the output of one element is the input of the next one. The input of the pipeline transformer is the input of the first transformer in the pipeline, and the output is the output of the last transformer in the pipeline. The pipeline transformer itself does not perform any data transformation on its own.
