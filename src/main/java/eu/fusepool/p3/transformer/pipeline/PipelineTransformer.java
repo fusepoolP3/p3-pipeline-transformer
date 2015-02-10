@@ -1,5 +1,7 @@
 package eu.fusepool.p3.transformer.pipeline;
 
+import eu.fusepool.p3.accept.util.AcceptPreference;
+import eu.fusepool.p3.accept.util.AcceptPreference.AcceptHeaderEntry;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.TransformerException;
@@ -7,7 +9,6 @@ import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
-import eu.fusepool.p3.transformer.util.AcceptPreference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
@@ -32,7 +34,7 @@ public class PipelineTransformer implements SyncTransformer {
 
     private Map<String, String> queryParams;
     private Pipeline pipeline;
-    private MimeType accept;
+    private MimeType[] accept;
     private int index;
 
     public PipelineTransformer(String queryString, String acceptHeader) {
@@ -47,7 +49,15 @@ public class PipelineTransformer implements SyncTransformer {
         // parsing of accept header
         try {
             AcceptPreference ac = AcceptPreference.fromString(acceptHeader);
-            accept = ac.getPreferredAccept();
+            Set<MimeType> mimeTypes = new HashSet<>();
+            for (AcceptHeaderEntry header : ac.getEntries()) {
+                mimeTypes.add(header.getMediaType());
+            }
+            accept = mimeTypes.toArray(new MimeType[mimeTypes.size()]);
+            System.out.println("---------------------------");
+            for (MimeType accept1 : accept) {
+                System.out.println(accept1.toString());
+            }
         } catch (NullPointerException ex) {
             accept = null;
         }

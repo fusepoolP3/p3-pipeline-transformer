@@ -4,8 +4,10 @@ import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.WritingEntity;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
@@ -90,7 +92,7 @@ public class Pipeline {
      * @return the Entity that is the output of the last transformer in the pipe
      * @throws java.io.IOException
      */
-    public Entity run(Entity data, MimeType accept) throws IOException {
+    public Entity run(Entity data, MimeType[] accept) throws IOException {
         final URI contentLocation = data.getContentLocation();
         Transformer current, next;
         MimeType[] acceptedMediaTypes;
@@ -107,7 +109,7 @@ public class Pipeline {
                 // if next is null, there is no more transformer in the pipeline
                 if (accept != null) {
                     // if accept is not null, set accepted mediatype explictly
-                    acceptedMediaTypes = new MimeType[]{accept};
+                    acceptedMediaTypes = accept;
                 } else {
                     // otherwise use the accepted mediatypes from the last transformer
                     acceptedMediaTypes = supportedOutputFormats.toArray(new MimeType[supportedOutputFormats.size()]);
@@ -176,5 +178,35 @@ public class Pipeline {
                 }
             }
         }
+    }
+
+    // convert InputStream to String
+    private static String getStringFromInputStream(InputStream is) {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        try {
+
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return sb.toString();
+
     }
 }
