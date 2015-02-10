@@ -54,10 +54,6 @@ public class PipelineTransformer implements SyncTransformer {
                 mimeTypes.add(header.getMediaType());
             }
             accept = mimeTypes.toArray(new MimeType[mimeTypes.size()]);
-            System.out.println("---------------------------");
-            for (MimeType accept1 : accept) {
-                System.out.println(accept1.toString());
-            }
         } catch (NullPointerException ex) {
             accept = null;
         }
