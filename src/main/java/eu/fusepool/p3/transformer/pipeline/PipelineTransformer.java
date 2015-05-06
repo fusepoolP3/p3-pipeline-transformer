@@ -9,15 +9,16 @@ import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
+import eu.fusepool.p3.transformer.pipeline.cache.Cache;
+import eu.fusepool.p3.transformer.pipeline.util.HTTPClient;
+import eu.fusepool.p3.transformer.pipeline.util.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.MimeType;
@@ -35,15 +36,18 @@ public class PipelineTransformer implements SyncTransformer {
     private Map<String, String> queryParams;
     private Pipeline pipeline;
     private MimeType[] accept;
-    private int index;
 
     public PipelineTransformer(String queryString, String acceptHeader) {
-        // get query params from query string
-        queryParams = getQueryParams(queryString);
+        // query string cannot be empty
+        if (StringUtils.isEmpty(queryString)) {
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string must not be empty! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
+        }
 
+        // get query params from query string
+        queryParams = Utils.getQueryParams(queryString);
         // query string must not be empty
         if (queryParams.isEmpty()) {
-            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No valid query param found! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No valid query param found! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
         }
 
         // parsing of accept header
@@ -58,24 +62,33 @@ public class PipelineTransformer implements SyncTransformer {
             accept = null;
         }
 
+        // processing config rdf
+        String configURI = queryParams.get("config");
+        // config URI
+        if (StringUtils.isEmpty(configURI)) {
+            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No config URI was found in query string! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
+        }
+
+        // get config resource supplied URI
+        List<String> transformerURIs = HTTPClient.getTransformers(configURI);
+
         // create new pipeline if it does not exist
         if (pipeline == null) {
             pipeline = new Pipeline();
 
             Transformer transformer;
-            for (int i = 1; i <= index; i++) {
-                // get transformer URI from query params
-                String transformerURI = queryParams.get("t" + i);
-                // query param should not be empty or blank
-                if (StringUtils.isNotBlank(transformerURI)) {
-                    try {
-                        // decode transformer URI
-                        transformerURI = URLDecoder.decode(transformerURI, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new RuntimeException(e);
+            for (String transformerURI : transformerURIs) {
+                // query param should not be empty
+                if (StringUtils.isNotEmpty(transformerURI)) {
+                    // get tranformer from cache
+                    transformer = Cache.getTransformer(transformerURI);
+                    // if not found in cache
+                    if (transformer == null) {
+                        // create transformer
+                        transformer = new TransformerClientImpl(transformerURI);
+                        // add to cache
+                        Cache.setTransformer(transformerURI, transformer);
                     }
-                    // create transformer
-                    transformer = new TransformerClientImpl(transformerURI);
                     // add transformer to pipeline
                     pipeline.addTransformer(transformer);
                 }
@@ -89,7 +102,7 @@ public class PipelineTransformer implements SyncTransformer {
                 pipeline.validate();
             } else {
                 // the pipeline should contain at least on transformer
-                throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Query string contains no transformer! \nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
+                throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Supplied pipeline contains no transformer! \nUsage: http://<pipeline_transformer_uri>/?pipeline=<config_uri>");
             }
         }
     }
@@ -144,31 +157,5 @@ public class PipelineTransformer implements SyncTransformer {
     @Override
     public boolean isLongRunning() {
         return false;
-    }
-
-    /**
-     * Get query parameters from a query string.
-     *
-     * @param queryString the query string
-     * @return HashMap containing the query parameters
-     */
-    private Map<String, String> getQueryParams(String queryString) {
-        try {
-            Map<String, String> temp = new HashMap<>();
-            // query string should not be empty or blank
-            if (StringUtils.isNotBlank(queryString)) {
-                String[] params = queryString.split("&");
-                String[] param;
-                index = 0;
-                for (String item : params) {
-                    param = item.split("=", 2);
-                    param[0] += param[0].equals("t") ? ++index : "";
-                    temp.put(param[0], param[1]);
-                }
-            }
-            return temp;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: Failed to parse query string!\nUsage: http://<pipeline_transformer>/?t=<transformer_1>&...&t=<transformer_N>");
-        }
     }
 }
