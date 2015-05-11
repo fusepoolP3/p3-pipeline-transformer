@@ -50,6 +50,17 @@ The configuration resource should look like the following:
     _:3 rdf:first <third_transformer_uri> ;
         rdf:rest rdf:nil .
 
+Which is the same as (using the shortcut syntax):
+
+    @prefix ldp: <http://www.w3.org/ns/ldp#> .
+    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    
+    <> a ldp:Resource , ldp:RDFSource , ldp:Container , ldp:BasicContainer ;
+        ldp:interactionModel ldp:Container ;
+        <http://schema.example.org/list> (
+        <first_transformer_uri> <second_transformer_uri> <third_transformer_uri> ).
+
 ### Validation
 
 The pipeline transformer performs a validation when invoked with a coinfiguration containing at least two transformers. A pipeline is valid if each transformer accepts at least one of the supported output formats the previous transformer.
