@@ -29,4 +29,27 @@ public class Utils {
         }
         return temp;
     }
+
+    /**
+     * Get transformer query parameters from a query string.
+     *
+     * @param queryString the query string
+     * @return HashMap containing the query parameters
+     */
+    public static Map<String, String> getTransformerQueryParams(String queryString) throws ArrayIndexOutOfBoundsException {
+        Map<String, String> temp = new HashMap<>();
+        // query string should not be empty or blank
+        if (StringUtils.isNotBlank(queryString)) {
+            String[] params = queryString.split("&");
+            String[] param;
+            int index = 0;
+            for (String item : params) {
+                param = item.split("=", 2);
+                if (param[0].equals("t")) {
+                    temp.put(param[0] + ++index, param[1]);
+                }
+            }
+        }
+        return temp;
+    }
 }

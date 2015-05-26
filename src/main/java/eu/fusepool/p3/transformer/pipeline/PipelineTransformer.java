@@ -16,7 +16,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,15 +65,42 @@ public class PipelineTransformer implements SyncTransformer {
             accept = null;
         }
 
+        // list for storing the transformer URIs in order
+        List<String> transformerURIs = null;
+
         // processing config rdf
         String configURI = queryParams.get("config");
         // config URI
         if (StringUtils.isEmpty(configURI)) {
-            throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No config URI was found in query string! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
-        }
+            // if no config URI was found, try getting the transformer uris the old way
+            queryParams = Utils.getTransformerQueryParams(queryString);
 
-        // get config resource supplied URI
-        List<String> transformerURIs = HTTPClient.getTransformers(configURI);
+            // if this is still empty raise an exception
+            if (queryParams.isEmpty()) {
+                throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No config URI was found in query string! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
+            }
+
+            // get the tranformer URIs from the map
+            transformerURIs = new ArrayList<>();
+            for (int i = 1; i <= queryParams.size(); i++) {
+                // get transformer URI from query params
+                String transformerURI = queryParams.get("t" + i);
+                // query param should not be empty or blank
+                if (StringUtils.isNotBlank(transformerURI)) {
+                    try {
+                        // decode transformer URI
+                        transformerURI = URLDecoder.decode(transformerURI, "UTF-8");
+                        // add URI to the list
+                        transformerURIs.add(transformerURI);
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        } else {
+            // get transformer URIs from supplied config resource
+            transformerURIs = HTTPClient.getTransformers(configURI);
+        }
 
         // create new pipeline if it does not exist
         if (pipeline == null) {
