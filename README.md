@@ -36,10 +36,11 @@ The configuration resource should look like the following:
     @prefix ldp: <http://www.w3.org/ns/ldp#> .
     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
     @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    @prefix pipeline: <http://vocab.fusepool.info/pipeline-transformer#> .
     
     <> a ldp:Resource , ldp:RDFSource , ldp:Container , ldp:BasicContainer ;
         ldp:interactionModel ldp:Container ;
-        <http://schema.example.org/list> _:1 .
+        pipeline:transformers _:1 .
     
     _:1 rdf:first <first_transformer_uri> ;
         rdf:rest _:2 .
