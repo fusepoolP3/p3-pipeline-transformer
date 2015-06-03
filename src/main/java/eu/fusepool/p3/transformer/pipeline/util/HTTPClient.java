@@ -21,7 +21,7 @@ import org.apache.stanbol.commons.indexedgraph.IndexedMGraph;
  */
 public class HTTPClient {
 
-    final static UriRef LIST = new UriRef("http://schema.example.org/list");
+    final static UriRef LIST = new UriRef("http://vocab.fusepool.info/pipeline-transformer#transformers");
     final static UriRef FIRST = new UriRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
     final static UriRef REST = new UriRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
 
