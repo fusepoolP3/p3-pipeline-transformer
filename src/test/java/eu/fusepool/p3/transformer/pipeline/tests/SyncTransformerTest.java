@@ -20,8 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for Pipeline Transformer. It creates two transformers that have compatible input and output media types and
- * runs them in a pipeline.
+ * Unit test for Pipeline Transformer. It creates two transformers that have
+ * compatible input and output media types and runs them in a pipeline.
  */
 public class SyncTransformerTest {
 

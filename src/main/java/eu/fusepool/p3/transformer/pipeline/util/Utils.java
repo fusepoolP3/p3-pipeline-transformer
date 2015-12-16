@@ -52,4 +52,17 @@ public class Utils {
         }
         return temp;
     }
+
+    /**
+     * Fixes URI if not valid;
+     *
+     * @param uri
+     * @return
+     */
+    public static String fixURI(String uri) {
+        if (!uri.contains("/?")) {
+            uri = uri.replace("?", "/?");
+        }
+        return uri;
+    }
 }

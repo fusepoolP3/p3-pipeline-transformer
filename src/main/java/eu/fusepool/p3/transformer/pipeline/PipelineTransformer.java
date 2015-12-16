@@ -12,18 +12,24 @@ import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
 import eu.fusepool.p3.transformer.pipeline.cache.Cache;
 import eu.fusepool.p3.transformer.pipeline.util.HTTPClient;
 import eu.fusepool.p3.transformer.pipeline.util.Utils;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.activation.MimeType;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -36,7 +42,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PipelineTransformer implements SyncTransformer {
 
-    private Map<String, String> queryParams;
     private Pipeline pipeline;
     private MimeType[] accept;
 
@@ -47,7 +52,7 @@ public class PipelineTransformer implements SyncTransformer {
         }
 
         // get query params from query string
-        queryParams = Utils.getQueryParams(queryString);
+        Map<String, String> queryParams = Utils.getQueryParams(queryString);
         // query string must not be empty
         if (queryParams.isEmpty()) {
             throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "ERROR: No valid query param found! \nUsage: http://<pipeline_transformer_uri>/?config=<config_uri>");
@@ -90,6 +95,8 @@ public class PipelineTransformer implements SyncTransformer {
                     try {
                         // decode transformer URI
                         transformerURI = URLDecoder.decode(transformerURI, "UTF-8");
+                        // fix if now valid
+                        transformerURI = Utils.fixURI(transformerURI);
                         // add URI to the list
                         transformerURIs.add(transformerURI);
                     } catch (UnsupportedEncodingException e) {
@@ -98,8 +105,14 @@ public class PipelineTransformer implements SyncTransformer {
                 }
             }
         } else {
-            // get transformer URIs from supplied config resource
-            transformerURIs = HTTPClient.getTransformers(configURI);
+            try {
+                // decode config URI
+                configURI = URLDecoder.decode(configURI, "UTF-8");
+                // get transformer URIs from supplied config resource
+                transformerURIs = HTTPClient.getTransformers(configURI);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // create new pipeline if it does not exist
@@ -108,6 +121,8 @@ public class PipelineTransformer implements SyncTransformer {
 
             Transformer transformer;
             for (String transformerURI : transformerURIs) {
+                // fix if now valid
+                transformerURI = Utils.fixURI(transformerURI);
                 // query param should not be empty
                 if (StringUtils.isNotEmpty(transformerURI)) {
                     // get tranformer from cache

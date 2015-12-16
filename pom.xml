@@ -41,7 +41,7 @@
                     <mainClass>${main.class}</mainClass>
                     <arguments>
                         <argument>-P</argument>
-                        <argument>7100</argument>
+                        <argument>8300</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -107,6 +107,18 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.clerezza</groupId>
+            <artifactId>rdf.jena.parser</artifactId>
+            <version>0.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.stanbol</groupId>
+            <artifactId>org.apache.stanbol.commons.indexedgraph</artifactId>
+            <version>0.12.0</version>
+        </dependency>
+        
+        <!-- test -->
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
@@ -119,26 +131,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.clerezza</groupId>
-            <artifactId>rdf.jena.parser</artifactId>
-            <version>0.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.stanbol</groupId>
-            <artifactId>org.apache.stanbol.commons.indexedgraph</artifactId>
-            <version>0.12.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.2.4</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
 
